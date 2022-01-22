@@ -1,15 +1,19 @@
-from django.shortcuts import render
-from django.http import FileResponse
-from random import random
+from django.http import HttpResponse, response
+
 from . import quickstart
 
 import os
 
-import google_auth_oauthlib.flow
-import googleapiclient.discovery
-import googleapiclient.errors
 
 # Create your views here.
 def index(request):
     filename = quickstart.downloadrandom()
-    
+    file = open(filename, "rb").read()
+    # return FileResponse(file)
+    # file = open("/path/to/your/song.mp3", "rb").read() 
+    response = HttpResponse()
+    response.write(file)
+    # response['Content-Type'] = 'audio/mp3'
+    response['Content-Disposition'] = f'attachment; filename={filename}' 
+    quickstart.cleanup(filename)
+    return response
