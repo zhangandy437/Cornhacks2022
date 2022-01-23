@@ -1,10 +1,10 @@
 import './App.css';
-import video from './videoFolder/SkiVideo.mp4';
 
 const MusicVideo = () => {
+
     return (
         <div className={'the_video'}>
-            <iframe width='75%' height='75%' src={video} />
+            <iframe width="800" height="800" src='http:127.0.0.1:8000/youtube/stichVideo/' />
         </div>
     );
 }
