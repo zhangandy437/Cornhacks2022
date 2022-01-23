@@ -4,6 +4,14 @@ import requests, re
 from bs4 import BeautifulSoup
 import urllib.request
 
+import cv2
+import matplotlib.pyplot as plt
+import skimage
+import skimage.feature
+import skimage.viewer
+from random import random, choice
+from PIL import ImageEnhance, Image, UnidentifiedImageError
+
 headers = {
     "User-Agent":
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19582"
@@ -31,6 +39,40 @@ params = {
 
 html = requests.get("https://www.google.com/search", params=params, headers=headers)
 
+def augment(imgpath):
+    img = cv2.imread(imgpath)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) # Fixes color read issue
+
+    img = cv2.imread(imgpath, 0)
+    
+    edges = skimage.feature.canny(
+        image=img,
+        sigma=int(random() * 3 + 2),
+        low_threshold=2,
+        high_threshold=10,
+    )
+
+    plt.imshow(edges, interpolation='nearest', aspect='auto')
+    plt.xticks([]), plt.yticks([])
+    plt.gca().set_axis_off()
+    plt.subplots_adjust(top = 1, bottom = 0, right = 1, left = 0, 
+                hspace = 0, wspace = 0)
+    plt.margins(0,0)
+    plt.savefig(f'{imgpath}au.jpg')
+    plt.clf()
+    return f'{imgpath}au.jpg'
+    # plt.show()
+
+def enhance(imgpath):
+    try:
+        image = Image.open(imgpath)
+    except UnidentifiedImageError:
+        return augment(imgpath)
+    rgb_im = image.convert('RGB')
+    enhancer = ImageEnhance.Color(rgb_im)
+    enhancer.enhance(int(random() * 3 + 4)).save(imgpath+'au.jpg')
+    return imgpath+'au.jpg'
+    
 def get_images_data():
 
     print('\nGoogle Images Metadata:')
@@ -86,10 +128,14 @@ def get_images_data():
         original_size_img = bytes(original_size_img_not_fixed, 'ascii').decode('unicode-escape')
         print(original_size_img)
         try:
-            urllib.request.urlretrieve(original_size_img, f"imgs/{index}.jpg")
-            out.append(f'imgs/{index}.jpg')
+            path = f"imgs/{index}.jpg"
+            urllib.request.urlretrieve(original_size_img, path)
+            out.append(path)
+            fun = choice([enhance, augment])
+            out.append(fun(path))
         except (HTTPError, URLError) as e:
             print("o well")
     
     return out
 # get_images_data()
+

@@ -29,7 +29,7 @@ def downloadrandom():
     }
     try:
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([f'https://www.youtube.com/watch?v={item}'])
+            print(ydl.download([f'https://www.youtube.com/watch?v={item}']))
     except DownloadError:
         print("welp")
 

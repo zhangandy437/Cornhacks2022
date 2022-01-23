@@ -42,16 +42,19 @@ def stitch(request):
     vid = img.set_audio(audio)
     vid.duration = audio.duration
     vid.write_videofile("test.mp4", fps=60)
-    
-    file = open('test.mp4', "rb").read()
+    quickstart.cleanup(audio_path)
+    return HttpResponse()
+
+def view(request):
+    # file = open('test.mp4', "rb").read()
+    with open('test.mp4', "rb") as mp:
+        file = mp.read()
     
     response = HttpResponse()
     response.write(file)
-    # response['Content-Type'] = 'audio/mp3'
-    response['Content-Disposition'] = f'attachment; filename=vid.mp4' 
-    # cleanup
-    cleanup()
-    quickstart.cleanup(audio_path)
+    response['Content-Type'] = 'video/mp4'
+    # response['Content-Disposition'] = f'attachment; filename=vid.mp4' 
+    # cleanup(photos)
     return response
 
 def cleanup(imgs):
