@@ -154,3 +154,4 @@ cython_debug/
 #.idea/
 
 imgs/
+*.mp4.DS_Store
